@@ -1,5 +1,6 @@
 package com.ptp.phamtanphat.authentication0405;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,11 +15,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText edtTk, edtMk;
-    Button btnDangky,btnDangnhap;
+    Button btnDangky, btnDangnhap, btnCapnhat,btnXacthuc;
     FirebaseAuth mAuth;
 
     @Override
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         edtTk = findViewById(R.id.edittextUser);
         btnDangky = findViewById(R.id.buttonDangky);
         btnDangnhap = findViewById(R.id.buttonDangnhap);
+        btnCapnhat = findViewById(R.id.buttonUpdate);
+        btnXacthuc = findViewById(R.id.buttonXacthuc);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -47,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(MainActivity.this, "Dang ky thanh cong", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.d("BBB",task.getException().toString());
+                                    Log.d("BBB", task.getException().toString());
                                 }
                             }
                         });
@@ -72,5 +76,62 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+        btnCapnhat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                if (user != null) {
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName("Pham Tan Phat")
+                            .setPhotoUri(Uri.parse("https://pbs.twimg.com/profile_images/875443327835025408/ZvmtaSXW_400x400.jpg"))
+                            .build();
+
+                    user.updateProfile(profileUpdates)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(MainActivity.this, "Cap nhat thanh cong", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(MainActivity.this, "That bai", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+
+            }
+        });
+
+        btnXacthuc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final FirebaseUser user =  FirebaseAuth.getInstance().getCurrentUser();
+
+                if (user != null){
+                    user.sendEmailVerification()
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+
+                                        Toast.makeText(MainActivity.this, "Thanh cong", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        Toast.makeText(MainActivity.this, "That bai", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+
+
+            }
+        });
     }
+
+//    @Override
+//    protected void onStart() {
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        Log.d("BBB",user.getPhotoUrl() + "");
+//        super.onStart();
+//    }
 }
